@@ -13,6 +13,8 @@ set(CMAKE_GENERATOR_PLATFORM Win32 CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVK_PROTOTYPES" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVK_PROTOTYPES" CACHE STRING "" FORCE)
 
+set(PRECOMPILED_HEADER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h")
+
 # Set output directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin" CACHE STRING "" FORCE)
 
@@ -20,9 +22,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin" CACHE STRING "" F
 add_compile_definitions(UNICODE _UNICODE)
 
 
-# Set source files
+# Set source & header files
 file(GLOB SOURCE_FILES src/*.cpp)
-#set(SOURCE_FILES src/dllmain.cpp)
+file(GLOB HEADER_FILES src/*.hpp src/*.h)
+
 set(IMGUI_FILES libs/imgui/backends/imgui_impl_glfw.cpp libs/imgui/backends/imgui_impl_vulkan.cpp libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_tables.cpp libs/imgui/imgui_widgets.cpp)
 
 # Configure GLFW before adding to project
@@ -43,7 +46,7 @@ find_package(Vulkan REQUIRED)
 
 
 # Create .dll
-add_library(Mjoelnir SHARED ${SOURCE_FILES} ${IMGUI_FILES})
+add_library(Mjoelnir SHARED ${SOURCE_FILES} ${IMGUI_FILES} ${HEADER_FILES})
 
 # Set properties
 target_compile_definitions(Mjoelnir PUBLIC -DImTextureID=ImU32)
@@ -53,3 +56,24 @@ target_compile_definitions(Mjoelnir PUBLIC -DImTextureID=ImU32)
 target_include_directories(Mjoelnir PUBLIC ${Vulkan_INCLUDE_DIRS})
 ## GLFW
 target_link_libraries(Mjoelnir PUBLIC glfw ${Vulkan_LIBRARIES})
+
+# Set precompiled header file
+target_precompile_headers(Mjoelnir PRIVATE ${PRECOMPILED_HEADER_FILE})
+
+# Set Mjoelnir as startup project
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Mjoelnir)
+
+# File structure in Code Editor
+source_group("Source Files\\Cheats" FILES src/IThreadedCheat.hpp src/IThreadedCheat.cpp src/ICheat.hpp src/ICheat.cpp src/Constants.hpp)
+source_group("Source Files\\Cheats\\Aimbot" FILES src/CAimbot.hpp src/CAimbot.cpp)
+source_group("Source Files\\Cheats\\Ammo" FILES src/CAmmo.hpp src/CAmmo.cpp)
+source_group("Source Files\\Cheats\\Health" FILES src/CHealth.hpp src/CHealth.cpp)
+source_group("Source Files\\Cheats\\Recoil" FILES src/CRecoil.hpp src/CRecoil.cpp)
+source_group("Source Files\\Cheats\\Debugging" FILES src/CDebugger.hpp src/CDebugger.cpp)
+source_group("Source Files\\Cheats\\Utility" FILES src/Utils.hpp src/Utils.cpp)
+source_group("Source Files\\Game-Logic" FILES src/Entity.hpp src/Entity.cpp src/ent.hpp)
+source_group("Source Files\\Main-Logic" FILES src/dllmain.cpp src/Game.hpp src/Game.cpp)
+source_group("Source Files\\Memory-Manipulation" FILES src/Hook.hpp src/Hook.cpp src/Memory.hpp src/Memory.cpp src/Process.hpp src/Process.cpp)
+source_group("Source Files\\UI" FILES )
+source_group("Source Files\\UI\\imgui" FILES libs/imgui/backends/imgui_impl_glfw.cpp libs/imgui/backends/imgui_impl_vulkan.cpp libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_tables.cpp libs/imgui/imgui_widgets.cpp)
+source_group("Precompile Header File" FILES src/pch.h src/pch.cpp src/framework.h)
