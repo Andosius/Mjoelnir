@@ -13,6 +13,8 @@ void CAimbot::Routine()
 {
 	while (m_Active)
 	{
+		//std::cout << "Aimbot[" << this->GetThread()->get_id() << "] routine!" << std::endl;
+
 		// In case we are not alive we won't do anything
 		if (!m_Client->GetLocalPlayer()->IsAlive())
 			continue;

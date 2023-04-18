@@ -5,9 +5,8 @@
 #include "CDebugger.hpp"
 
 
-void CDebugger::Routine()
+void CDebugger::CheckInteraction()
 {
-
 	if (GetAsyncKeyState(m_Key) & 1)
 	{
 		//std::cout << "Current hp: " << m_LocalPlayer->playerent->m_Health << std::endl;

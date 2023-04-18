@@ -6,8 +6,12 @@ class CRecoil : public ICheat
 {
 public:
 	using ICheat::ICheat;
-	virtual void Enable();
-	virtual void Disable();
+
+	using ICheat::Toggle;
+	using ICheat::CheckInteraction;
+
+	void Enable() override;
+	void Disable() override;
 
 private:
 };
