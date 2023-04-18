@@ -26,40 +26,41 @@ void Game::Initialize()
 
 		m_Matrix = *(glm::mat4x4**)(m_BaseAddr + OPENGL_MATRIX_ADDRESS);
 	}
+
+	p_EntityUpdater = std::thread(&Game::UpdateEntityList, this);
 }
 
 void Game::Cleanup()
 {
-
-
+	//std::cout << "Disabling cheats!" << std::endl;
 	for (auto& cheat : m_Cheats)
 	{
+		//std::cout << "[EOF] " << cheat->GetName() << " gets deleted!" << std::endl;
 		cheat->Disable();
 		delete cheat;
 	}
 
+	//std::cout << "Deleting m_LocalPlayer!" << std::endl;
+
 	delete m_LocalPlayer;
+
+	try
+	{
+		m_Active = false;
+		if (p_EntityUpdater.joinable())
+			p_EntityUpdater.detach();
+	}
+	catch (std::system_error* e) {}
 }
 
 void Game::Routine()
 {
-	/*
-	* So far our only cheat involving a Routine is the Aimbot,
-	* the ESP is about to follow. For synchronization reasons
-	* I'm going to implement std::thread p_Thread to ICheat so
-	* they can access the Player-List via Game-Mutex. That should
-	* prevent crashes and flickering - atleast I hope so, lol.
-	*/
+	//std::cout << "Game routine!" << std::endl;
 
-	p_Mutex.lock();
-
-	UpdateEntityList();
 	for (auto& cheat : m_Cheats)
 	{
 		cheat->CheckInteraction();
 	}
-
-	p_Mutex.unlock();
 }
 
 uint32_t Game::GetPlayerCount()
@@ -69,19 +70,29 @@ uint32_t Game::GetPlayerCount()
 
 void Game::UpdateEntityList()
 {
-	m_Players.clear();
 
-	uint32_t player_count = GetPlayerCount();
-
-	uint32_t* player_list = (uint32_t*)(m_BaseAddr + PLAYER_LIST_ADDRESS);
-
-	for (uint32_t i = 0; i < player_count; i++)
+	while (m_Active)
 	{
+		//std::cout << "Update Entity List!" << std::endl;
+		p_Mutex.lock();
 
-		ent* playerent = *(ent**)(*player_list + (i * 0x4));
-		if (playerent != nullptr)
+		m_Players.clear();
+
+		uint32_t player_count = GetPlayerCount();
+
+		uint32_t* player_list = (uint32_t*)(m_BaseAddr + PLAYER_LIST_ADDRESS);
+
+		for (uint32_t i = 0; i < player_count; i++)
 		{
-			m_Players.push_back(Entity(playerent));
+
+			ent* playerent = *(ent**)(*player_list + (i * 0x4));
+			if (playerent != nullptr)
+			{
+				m_Players.push_back(Entity(playerent));
+			}
 		}
+		p_Mutex.unlock();
+
 	}
+
 }

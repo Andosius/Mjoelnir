@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include <iostream>
 #include <memory>
 
 #include "Game.hpp"
@@ -17,17 +18,17 @@ DWORD WINAPI MainThread(HMODULE hModule)
 	FILE* f = nullptr;
 	freopen_s(&f, "CONOUT$", "w", stdout);
 
-    DisableThreadLibraryCalls(hModule);
+    //DisableThreadLibraryCalls(hModule);
 
     Game client;
     client.Initialize();
 
     // Add Cheats here
-    client.AddCheat(new CDebugger(&client, VK_NUMPAD5));
-    client.AddCheat(new CAimbot(&client, VK_NUMPAD2));
-    client.AddCheat(new CRecoil(&client, VK_NUMPAD3));
-	client.AddCheat(new CAmmo(&client, VK_NUMPAD6));
-	client.AddCheat(new CHealth(&client, VK_NUMPAD7));
+    client.AddCheat(new CDebugger(&client, VK_NUMPAD5, "Debugger"));
+    client.AddCheat(new CAimbot(&client, VK_NUMPAD2, "Aimbot"));
+    client.AddCheat(new CRecoil(&client, VK_NUMPAD3, "NoRecoil"));
+	client.AddCheat(new CAmmo(&client, VK_NUMPAD6, "AmmoHack"));
+	client.AddCheat(new CHealth(&client, VK_NUMPAD7, "Invulnerability"));
 
 
     while (client.IsRunning())
@@ -42,9 +43,6 @@ DWORD WINAPI MainThread(HMODULE hModule)
     }
 
     client.Cleanup();
-
-	// Wait for threads to finish!
-	Sleep(2000);
 
     // Free console stuff
 	fclose(f);

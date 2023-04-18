@@ -47,5 +47,6 @@ private:
 	std::vector<Entity> m_Players;
 
 	std::mutex p_Mutex;
+	std::thread p_EntityUpdater;
 };
 
