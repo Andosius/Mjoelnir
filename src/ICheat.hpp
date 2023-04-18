@@ -12,19 +12,33 @@ class ICheat
 {
 public:
 	ICheat() : m_Client(nullptr), m_Active(false), m_Key(VK_RETURN) {};
-	ICheat(Game* client, int key) : m_Client(client), m_Active(false), m_Key(key) {};
+	ICheat(Game* client, int key, const char* name) : m_Client(client), m_Active(false), m_Key(key), m_Name(name) {};
 	~ICheat() {};
+
+	const char* GetName() { return m_Name; }
+
 	virtual void Routine() {};
-	virtual void CheckInteraction();
-	virtual void Toggle();
+	virtual void CheckInteraction() { if (GetAsyncKeyState(m_Key) & 1) Toggle();}
+	virtual void Toggle()
+	{
+		if (m_Active)
+		{
+			m_Active = false;
+			Disable();
+		}
+		else
+		{
+			m_Active = true;
+			Enable();
+		}
+	}
 	virtual void Enable() {};
 	virtual void Disable() {};
-	std::thread* GetThread() { return &p_Thread; };
 
 
 protected:
 	Game* m_Client = nullptr;
 	bool m_Active;
 	int m_Key;
-	std::thread p_Thread;
+	const char* m_Name;
 };
