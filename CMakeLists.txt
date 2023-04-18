@@ -64,7 +64,7 @@ target_precompile_headers(Mjoelnir PRIVATE ${PRECOMPILED_HEADER_FILE})
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Mjoelnir)
 
 # File structure in Code Editor
-source_group("Source Files\\Cheats" FILES src/IThreadedCheat.hpp src/IThreadedCheat.cpp src/ICheat.hpp src/ICheat.cpp src/Constants.hpp)
+source_group("Source Files\\Cheats" FILES src/IThreadedCheat.hpp src/ICheat.hpp src/Constants.hpp)
 source_group("Source Files\\Cheats\\Aimbot" FILES src/CAimbot.hpp src/CAimbot.cpp)
 source_group("Source Files\\Cheats\\Ammo" FILES src/CAmmo.hpp src/CAmmo.cpp)
 source_group("Source Files\\Cheats\\Health" FILES src/CHealth.hpp src/CHealth.cpp)
