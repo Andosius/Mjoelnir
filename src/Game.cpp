@@ -27,7 +27,9 @@ void Game::Initialize()
 		m_Matrix = *(glm::mat4x4**)(m_BaseAddr + OPENGL_MATRIX_ADDRESS);
 	}
 
-	p_EntityUpdater = std::thread(&Game::UpdateEntityList, this);
+	m_Window = FindWindow(nullptr, L"AssaultCube");
+
+	p_EntityUpdater = std::thread(&Game::UpdateGameInformation, this);
 }
 
 void Game::Cleanup()
@@ -68,7 +70,7 @@ uint32_t Game::GetPlayerCount()
 	return *(uint32_t*)(m_BaseAddr + PLAYER_COUNT_ADDRESS);
 }
 
-void Game::UpdateEntityList()
+void Game::UpdateGameInformation()
 {
 
 	while (m_Active)
@@ -93,6 +95,13 @@ void Game::UpdateEntityList()
 		}
 		p_Mutex.unlock();
 
+	}
+
+	RECT rect;
+	if (GetClientRect(m_Window, &rect))
+	{
+		m_WindowData.x = rect.right - rect.left;
+		m_WindowData.y = rect.bottom - rect.top;
 	}
 
 }

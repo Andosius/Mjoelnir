@@ -8,6 +8,7 @@
 #include <mutex>
 
 #include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
 
 
 
@@ -34,8 +35,10 @@ public:
 
 	void AddCheat(ICheat* cheat) { m_Cheats.push_back(cheat); };
 
+	glm::vec2 GetWindowData() { return m_WindowData; };
+
 private:
-	void UpdateEntityList();
+	void UpdateGameInformation();
 
 	bool m_Active;
 	uintptr_t m_BaseAddr;
@@ -48,5 +51,8 @@ private:
 
 	std::mutex p_Mutex;
 	std::thread p_EntityUpdater;
+
+	HWND m_Window;
+	glm::vec2 m_WindowData;
 };
 
