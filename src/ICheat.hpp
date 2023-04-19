@@ -11,7 +11,7 @@ class Game;
 class ICheat
 {
 public:
-	ICheat() : m_Client(nullptr), m_Active(false), m_Key(VK_RETURN) {};
+	ICheat() : m_Client(nullptr), m_Active(false), m_Key(VK_RETURN), m_Name("") {};
 	ICheat(Game* client, int key, const char* name) : m_Client(client), m_Active(false), m_Key(key), m_Name(name) {};
 	~ICheat() {};
 
