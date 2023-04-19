@@ -21,29 +21,23 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin" CACHE STRING "" F
 # Set Windows defines for SDK usage
 add_compile_definitions(UNICODE _UNICODE)
 
+# Set Module Path for DirectX9
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # Set source & header files
 file(GLOB SOURCE_FILES src/*.cpp)
 file(GLOB HEADER_FILES src/*.hpp src/*.h)
 
-set(IMGUI_FILES libs/imgui/backends/imgui_impl_glfw.cpp libs/imgui/backends/imgui_impl_vulkan.cpp libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_tables.cpp libs/imgui/imgui_widgets.cpp)
+set(IMGUI_FILES libs/imgui/backends/imgui_impl_dx9.cpp libs/imgui/backends/imgui_impl_win32.cpp libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_tables.cpp libs/imgui/imgui_widgets.cpp)
 
-# Configure GLFW before adding to project
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-# Add subdirectories for glfw and glm
-add_subdirectory(libs/glfw)
+# Add subdirectory for glm
 add_subdirectory(libs/glm)
 
 # Include Dear ImGui
 include_directories(libs/imgui libs/imgui/backends)
 
-
-# Find Vulkan
-find_package(Vulkan REQUIRED)
-
+# Find DirectX
+find_package(DirectX9 REQUIRED)
 
 # Create .dll
 add_library(Mjoelnir SHARED ${SOURCE_FILES} ${IMGUI_FILES} ${HEADER_FILES})
@@ -52,10 +46,9 @@ add_library(Mjoelnir SHARED ${SOURCE_FILES} ${IMGUI_FILES} ${HEADER_FILES})
 target_compile_definitions(Mjoelnir PUBLIC -DImTextureID=ImU32)
 
 # Link target
-## Vulkan
-target_include_directories(Mjoelnir PUBLIC ${Vulkan_INCLUDE_DIRS})
-## GLFW
-target_link_libraries(Mjoelnir PUBLIC glfw ${Vulkan_LIBRARIES})
+## DirectX9
+target_include_directories(Mjoelnir PUBLIC libs/glm ${DirectX9_INCLUDE_DIR})
+target_link_libraries(Mjoelnir PUBLIC glm::glm ${DirectX9_LIBRARY})
 
 # Set precompiled header file
 target_precompile_headers(Mjoelnir PRIVATE ${PRECOMPILED_HEADER_FILE})
@@ -75,5 +68,5 @@ source_group("Source Files\\Game-Logic" FILES src/Entity.hpp src/Entity.cpp src/
 source_group("Source Files\\Main-Logic" FILES src/dllmain.cpp src/Game.hpp src/Game.cpp)
 source_group("Source Files\\Memory-Manipulation" FILES src/Hook.hpp src/Hook.cpp src/Memory.hpp src/Memory.cpp src/Process.hpp src/Process.cpp)
 source_group("Source Files\\UI" FILES )
-source_group("Source Files\\UI\\imgui" FILES libs/imgui/backends/imgui_impl_glfw.cpp libs/imgui/backends/imgui_impl_vulkan.cpp libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_tables.cpp libs/imgui/imgui_widgets.cpp)
+source_group("Source Files\\UI\\imgui" FILES ${IMGUI_FILES})
 source_group("Precompile Header File" FILES src/pch.h src/pch.cpp src/framework.h)
