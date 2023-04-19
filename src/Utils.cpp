@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include <glm/vec3.hpp>
+#include <glm/gtc/matrix_access.hpp>
 
 #include "Utils.hpp"
 
@@ -54,7 +55,7 @@ bool OpenGL_WorldToScreen(glm::vec3 pos, glm::mat4x4* viewMatrix, glm::vec2& scr
 	// we no longer need projection matrix
 	glm::vec4 worldEye = { pos, 1.0f };
 
-	glm::vec4 clip = viewMatrix * worldEye;
+	glm::vec4 clip = (*viewMatrix) * worldEye;
 
 	if (clip.w < 0.1f)
 		return false;
