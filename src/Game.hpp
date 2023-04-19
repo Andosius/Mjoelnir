@@ -11,14 +11,14 @@
 #include <glm/vec2.hpp>
 
 
-
 #include "Entity.hpp"
 #include "ICheat.hpp"
 
 class Game
 {
 public:
-	Game() : m_BaseAddr(NULL), m_Active(false), m_LocalPlayer(nullptr), m_Matrix(nullptr) {};
+	Game() :
+		m_BaseAddr(NULL), m_Active(false), m_LocalPlayer(nullptr), m_Matrix(nullptr), m_Window(NULL), m_WindowData(0.0f, 0.0f) {};
 	~Game() { Cleanup(); };
 	void Initialize();
 	void Cleanup();
@@ -27,7 +27,7 @@ public:
 
 	uintptr_t GetBaseAddr() { return m_BaseAddr; };
 	Entity* GetLocalPlayer() { return m_LocalPlayer; };
-	glm::mat4x4* GetProjectionMatrix() { return m_Matrix; };
+	glm::mat4x4* GetViewMatrix() { return m_Matrix; };
 	uint32_t GetPlayerCount();
 	std::vector<Entity>* GetPlayers() { return &m_Players; };
 
