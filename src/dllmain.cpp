@@ -15,10 +15,11 @@ DWORD WINAPI MainThread(HMODULE hModule)
 {
 	// Create console
 	AllocConsole();
-	FILE* f = nullptr;
+    FILE* f = nullptr;
 	freopen_s(&f, "CONOUT$", "w", stdout);
 
-    //DisableThreadLibraryCalls(hModule);
+    if (!f)
+        return 0;
 
     Game client;
     client.Initialize();
@@ -58,15 +59,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
                        LPVOID lpReserved
                      )
 {
-    switch (ul_reason_for_call)
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
     {
-    case DLL_PROCESS_ATTACH:
-        CloseHandle(CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)MainThread, hModule, NULL, nullptr));
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
-        break;
+        DisableThreadLibraryCalls(hModule);
+        HANDLE thread = CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)MainThread, hModule, NULL, nullptr);
+        if (thread)
+            CloseHandle(thread);
     }
-    return TRUE;
 }
 
