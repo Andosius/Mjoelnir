@@ -47,3 +47,23 @@ bool TraceLine(uintptr_t baseAddr, ent* localPlayer, glm::vec3 target)
 
 	return !result.collided;
 }
+
+bool OpenGL_WorldToScreen(glm::vec3 pos, glm::mat4x4* viewMatrix, glm::vec2& screen, glm::vec2 windowData)
+{
+	// Matrix Vector Product: Multiply worldeye with view matrix to get clip coordiantes => since worldEye contains pos and 1.0f
+	// we no longer need projection matrix
+	glm::vec4 worldEye = { pos, 1.0f };
+
+	glm::vec4 clip = viewMatrix * worldEye;
+
+	if (clip.w < 0.1f)
+		return false;
+
+	// Divide by perspective (clip.w = normalized device coordinates);
+	glm::vec3 normalized = { clip.x / clip.w, clip.y / clip.w, clip.z / clip.w }; 
+
+	// Transformation to window coordiantes
+	screen.x = (windowData.x / 2 * normalized.x) + (normalized.x + windowData.x / 2.0f);
+	screen.y = -(windowData.y / 2 * normalized.y) + (normalized.y + windowData.y / 2.0f);
+	return true;
+}
