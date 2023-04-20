@@ -19,7 +19,7 @@ set(PRECOMPILED_HEADER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin" CACHE STRING "" FORCE)
 
 # Set Windows defines for SDK usage
-add_compile_definitions(UNICODE _UNICODE)
+add_compile_definitions(UNICODE _UNICODE _CONSOLE)
 
 # Set Module Path for DirectX9
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -28,7 +28,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 file(GLOB SOURCE_FILES src/*.cpp)
 file(GLOB HEADER_FILES src/*.hpp src/*.h)
 
-set(IMGUI_FILES libs/imgui/backends/imgui_impl_dx9.cpp libs/imgui/backends/imgui_impl_win32.cpp libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_tables.cpp libs/imgui/imgui_widgets.cpp)
+set(IMGUI_FILES libs/imgui/backends/imgui_impl_dx9.cpp libs/imgui/backends/imgui_impl_win32.cpp libs/imgui/imgui.cpp libs/imgui/imgui_draw.cpp libs/imgui/imgui_demo.cpp libs/imgui/imgui_tables.cpp libs/imgui/imgui_widgets.cpp libs/imgui/misc/cpp/imgui_stdlib.cpp)
 
 # Add subdirectory for glm
 add_subdirectory(libs/glm)

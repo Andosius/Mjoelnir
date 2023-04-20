@@ -1,70 +1,54 @@
-#-------------------------------------------------------------------
-# This file is part of the CMake build system for OGRE
-#     (Object-oriented Graphics Rendering Engine)
-# For the latest info, see http://www.ogre3d.org/
+# FindDirectX9.cmake
 #
-# The contents of this file are placed in the public domain. Feel
-# free to make use of it in any way you like.
-#-------------------------------------------------------------------
+# Look for DirectX9 and define the following variables if found:
+#
+#   DIRECTX9_FOUND          - System has DirectX9
+#   DirectX9_LIBRARY      - Libraries needed to use DirectX9
+#   DirectX9_INCLUDE_DIR       - DirectX9 include directories
+#   DIRECTX9_LIB_PATH       - Path to DirectX9 libraries
+#
+# Additionally, if the "REQUIRED" argument is provided to find_package(),
+# the configuration process will fail if DirectX9 is not found.
 
-# -----------------------------------------------------------------------------
-# Find DirectX9 SDK
-# Define:
-# DirectX9_FOUND
-# DirectX9_INCLUDE_DIR
-# DirectX9_LIBRARY
-# DirectX9_ROOT_DIR
+# Check if the DXSDK_DIR environment variable is set and set DIRECTX9_FOUND accordingly.
+if(DEFINED ENV{DXSDK_DIR})
+    set(DIRECTX9_FOUND TRUE)
+else()
+    set(DIRECTX9_FOUND FALSE)
+endif()
 
-if(WIN32) # The only platform it makes sense to check for DirectX9 SDK
-  include(FindPkgMacros)
-  findpkg_begin(DirectX9)
-  
-  # Get path, convert backslashes as ${ENV_DXSDK_DIR}
-  getenv_path(DXSDK_DIR)
-  getenv_path(DirectX_HOME)
-  getenv_path(DirectX_ROOT)
-  getenv_path(DirectX_BASE)
-  
-  # construct search paths
-  set(DirectX9_PREFIX_PATH 
-    "${DXSDK_DIR}" "${ENV_DXSDK_DIR}"
-    "${DIRECTX_HOME}" "${ENV_DIRECTX_HOME}"
-    "${DIRECTX_ROOT}" "${ENV_DIRECTX_ROOT}"
-    "${DIRECTX_BASE}" "${ENV_DIRECTX_BASE}"
-    "C:/apps_x86/Microsoft DirectX SDK*"
-    "C:/Program Files (x86)/Microsoft DirectX SDK*"
-    "C:/apps/Microsoft DirectX SDK*"
-    "C:/Program Files/Microsoft DirectX SDK*"
-	"$ENV{ProgramFiles}/Microsoft DirectX SDK*"
-  )
+# Set the default value of DIRECTX9_BITS to "x86".
+if (NOT DEFINED DIRECTX9_BITS)
+    set(DIRECTX9_BITS "x86")
+endif()
 
-  create_search_paths(DirectX9)
+# If DirectX9 is found, set the include directories and library paths.
+if(DIRECTX9_FOUND)
+    # Set the path to the DirectX9 libraries.
+    set(DIRECTX9_LIB_PATH "$ENV{DXSDK_DIR}Lib\\${DIRECTX9_BITS}")
 
-  # redo search if prefix path changed
-  clear_if_changed(DirectX9_PREFIX_PATH
-    DirectX9_LIBRARY
-	DirectX9_INCLUDE_DIR
-  )
-  
-  find_path(DirectX9_INCLUDE_DIR NAMES d3d9.h D3DCommon.h HINTS ${DirectX9_INC_SEARCH_PATH})
-  # dlls are in DirectX9_ROOT_DIR/Developer Runtime/x64|x86
-  # lib files are in DirectX9_ROOT_DIR/Lib/x64|x86
-  if(CMAKE_CL_64)
-    set(DirectX9_LIBPATH_SUFFIX "x64")
-  else(CMAKE_CL_64)
-    set(DirectX9_LIBPATH_SUFFIX "x86")
-  endif(CMAKE_CL_64)
-  find_library(DirectX9_LIBRARY NAMES d3d9 HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
-  find_library(DirectX9_D3DX9_LIBRARY NAMES d3dx9 HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
-  find_library(DirectX9_DXGUID_LIBRARY NAMES dxguid HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
-  
-  findpkg_finish(DirectX9)
-  set(DirectX9_LIBRARIES ${DirectX9_LIBRARIES} 
-    ${DirectX9_D3DX9_LIBRARY}
-    ${DirectX9_DXGUID_LIBRARY}
-  )
-  
-  mark_as_advanced(DirectX9_D3DX9_LIBRARY DirectX9_DXGUID_LIBRARY
-    DirectX9_DXGI_LIBRARY DirectX9_D3DCOMPILER_LIBRARY) 
+    # Check if the required DirectX9 library files are present.
+    if(EXISTS "${DIRECTX9_LIB_PATH}\\d3dx9.lib" AND EXISTS "${DIRECTX9_LIB_PATH}\\d3d9.lib")
+        # Set the library files for DirectX9.
+        set(DirectX9_LIBRARY "${DIRECTX9_LIB_PATH}\\d3dx9.lib;${DIRECTX9_LIB_PATH}\\d3d9.lib")
 
-endif(WIN32)
+        # Set the include directories for DirectX9.
+        set(DirectX9_INCLUDE_DIR "$ENV{DXSDK_DIR}Include")
+        include_directories(${DirectX9_INCLUDE_DIR})
+
+        # Print a message indicating that DirectX9 was found.
+        message(STATUS "DirectX9 found: libraries = ${DirectX9_LIBRARY}, includes = ${DirectX9_INCLUDE_DIR}")
+    else()
+        # DirectX9 libraries not found.
+        message(FATAL_ERROR "DirectX9 libraries not found in ${DIRECTX9_LIB_PATH}")
+    endif()
+endif()
+
+# Report the results of the search to the user.
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(DirectX9 DEFAULT_MSG DirectX9_LIBRARY DirectX9_INCLUDE_DIR)
+
+# If DirectX9 was not found and the REQUIRED option was specified, fail the configuration process.
+if(DIRECTX9_REQUIRED AND NOT DIRECTX9_FOUND)
+    message(FATAL_ERROR "Could not find DirectX9")
+endif()
