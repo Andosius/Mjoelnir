@@ -9,16 +9,25 @@
 #include "CRecoil.hpp"
 #include "CAmmo.hpp"
 #include "CHealth.hpp"
+#include "Window.hpp"
+
+#define WINDOW_CLASS_NAME "MjoelnirDraw"
+#define WINDOW_NAME "Mjoelnir"
 
 
 DWORD WINAPI MainThread(HMODULE hModule)
 {
 	// Create console
-	AllocConsole();
-    FILE* f = nullptr;
-	freopen_s(&f, "CONOUT$", "w", stdout);
+    if (!AllocConsole())
+        return 0;
 
-    if (!f)
+    FILE* f = nullptr;
+
+	freopen_s(&f, "CONOUT$", "w", stdout);
+	//freopen_s(&f, "CONIN$", "r", stdin);
+	//freopen_s(&f, "CONOUT$", "w", stderr);
+
+    if (f == nullptr)
         return 0;
 
     Game client;
@@ -31,17 +40,28 @@ DWORD WINAPI MainThread(HMODULE hModule)
 	client.AddCheat(new CAmmo(&client, VK_NUMPAD6, "AmmoHack"));
 	client.AddCheat(new CHealth(&client, VK_NUMPAD7, "Invulnerability"));
 
+    // Create overlay
+    overlay.InitializeWindow(hModule, "SDL_app", WINDOW_CLASS_NAME, WINDOW_NAME);;
 
     while (client.IsRunning())
 	{
 		client.Routine();
         Sleep(1);
 
+		MSG msg{};
+		SecureZeroMemory(&msg, sizeof(msg));
+		if (GetMessageA(&msg, NULL, NULL, NULL))
+		{
+			TranslateMessage(&msg);
+			DispatchMessageA(&msg);
+		}
+
         if (GetAsyncKeyState(VK_NUMPAD9) & 1)
         {
             break;
         }
     }
+
 
     client.Cleanup();
 
@@ -59,12 +79,17 @@ BOOL APIENTRY DllMain( HMODULE hModule,
                        LPVOID lpReserved
                      )
 {
-    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
-    {
-        DisableThreadLibraryCalls(hModule);
-        HANDLE thread = CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)MainThread, hModule, NULL, nullptr);
-        if (thread)
-            CloseHandle(thread);
-    }
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+	{
+		DisableThreadLibraryCalls(hModule);
+		HANDLE handle = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, 0);
+		if (handle)
+			CloseHandle(handle);
+		break;
+	}
+	}
+	return TRUE;
 }
 
