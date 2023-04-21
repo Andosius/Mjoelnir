@@ -9,10 +9,11 @@
 #include "CRecoil.hpp"
 #include "CAmmo.hpp"
 #include "CHealth.hpp"
-#include "Window.hpp"
+#include "Overlay.hpp"
 
-#define WINDOW_CLASS_NAME "MjoelnirDraw"
-#define WINDOW_NAME "Mjoelnir"
+#define OVERLAY_CLASS_NAME				L"SDL_app"
+#define WINDOW_NAME						u8"Mjoelnir"
+#define WINDOW_CLASS_NAME				u8"MjoelnirDraw"
 
 
 DWORD WINAPI MainThread(HMODULE hModule)
@@ -41,27 +42,24 @@ DWORD WINAPI MainThread(HMODULE hModule)
 	client.AddCheat(new CHealth(&client, VK_NUMPAD7, "Invulnerability"));
 
     // Create overlay
-    overlay.InitializeWindow(hModule, "SDL_app", WINDOW_CLASS_NAME, WINDOW_NAME);;
+	Overlay::InitializeParameter(hModule, OVERLAY_CLASS_NAME, WINDOW_NAME, WINDOW_CLASS_NAME);
+	Overlay::Setup();
 
     while (client.IsRunning())
 	{
 		client.Routine();
-        Sleep(1);
 
-		MSG msg{};
-		SecureZeroMemory(&msg, sizeof(msg));
-		if (GetMessageA(&msg, NULL, NULL, NULL))
+		Overlay::Routine();
+
+		if (GetAsyncKeyState(VK_NUMPAD9) & 1)
 		{
-			TranslateMessage(&msg);
-			DispatchMessageA(&msg);
+			break;
 		}
 
-        if (GetAsyncKeyState(VK_NUMPAD9) & 1)
-        {
-            break;
-        }
+		Sleep(1);
     }
 
+	Overlay::Shutdown();
 
     client.Cleanup();
 
