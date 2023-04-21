@@ -60,4 +60,7 @@ namespace Overlay {
 	std::string RegisterPlugin(IDrawing* plugin);
 	bool RemovePlugin(std::string UUID);
 
+	std::mutex* GetMutex();
+	void SendVertices(std::vector<Object> vertices);
+
 }

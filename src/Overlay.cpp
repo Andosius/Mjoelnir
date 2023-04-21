@@ -32,7 +32,7 @@ static bool                             s_Visible = false;
 static bool                             s_ResetRequested = false;
 
 static std::map<std::string, IDrawing*> s_Plugins = {};
-static std::vector<Vertices>            s_Vertices(500);
+static std::vector<Object>              s_Vertices(150);
 static std::mutex                       s_Mutex = {};
 
 namespace Overlay {
@@ -298,10 +298,34 @@ namespace Overlay {
     {
         RenderDirectX9Frame();
 
+        s_Mutex.lock();
+
         if (s_Vertices.size() > 0)
         {
-            // check _D3DPRIMITIVETYPE out!
+
+            for (auto& obj : s_Vertices)
+            {
+                switch (obj.Type)
+                {
+                case DRAWING_TYPE_RECT:
+                    g_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+                    g_Device->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, &obj.Vertices[0], sizeof(Vertex));
+                    break;
+
+                case DRAWING_TYPE_FILLED_RECT:
+                    g_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+                    g_Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, &obj.Vertices[0], sizeof(Vertex));
+                    break;
+
+                case DRAWING_TYPE_TRIANGLE:
+                    g_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+                    g_Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, obj.Vertices.size() / 3, &obj.Vertices[0], sizeof(Vertex));
+                    break;
+                }
+            }
         }
+
+        s_Mutex.unlock();
 
         return TRUE;
     }
@@ -393,11 +417,14 @@ namespace Overlay {
         return &s_Mutex;
     }
 
-    void SendVertices(std::vector<Vertices> vertices)
+    void SendVertices(std::vector<Object> vertices)
     {
         // Just to make sure we don't bug the code by sending multiple vertices at the same time. :)
         s_Mutex.lock();
-        // TODO: move vertices to list!
+
+        s_Vertices.reserve(s_Vertices.size() + vertices.size());
+        std::move(vertices.begin(), vertices.end(), std::back_inserter(s_Vertices));
+
         s_Mutex.unlock();
     }
 
