@@ -1,11 +1,13 @@
 #include "pch.h"
 
 #include <glm/vec3.hpp>
-
 #include "Constants.hpp"
 
 #include "Utils.hpp"
 
+#include <random>
+#include <iomanip>
+#include <sstream>
 
 
 #define PI 3.141592653f
@@ -18,7 +20,7 @@ float GetDistance(glm::vec3 src, glm::vec3 dest)
 
 glm::vec3 CalculateHeadPosition(glm::vec3 src, glm::vec3 dest)
 {
-	glm::vec3 angles;
+	glm::vec3 angles{};
 	angles.x = -atan2f(dest.x - src.x, dest.y - src.y) / PI * 180.0f + 180.0f;
 	angles.y = asinf((dest.z - src.z) / GetDistance(src, dest)) * (180.0f / PI);
 	angles.z = 0.0f;
@@ -71,3 +73,33 @@ bool OpenGL_WorldToScreen(glm::vec3 pos, glm::mat4x4* viewMatrix, glm::vec2& scr
 	screen.y = -(windowData.y / 2 * normalized.y) + (normalized.y + windowData.y / 2.0f);
 	return true;
 }
+
+std::string generate_uuid() {
+	// Random generators
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<uint32_t> dis(0, 0xFFFFFFFF);
+
+	// Generate 4 32-Bit unsigned ints
+	uint32_t a = dis(gen);
+	uint32_t b = dis(gen);
+	uint32_t c = dis(gen);
+	uint32_t d = dis(gen);
+
+	// Convert into standardized UUID-Format
+	std::stringstream ss;
+	ss << std::hex << std::setfill('0');
+	ss << std::setw(8) << a << '-';
+	ss << std::setw(4) << b << '-';
+	ss << std::setw(4) << (c & 0x0FFFu | 0x4000u) << '-';
+	ss << std::setw(4) << ((d & 0x3FFFu) | 0x8000u) << '-';
+	ss << std::setw(8) << (d >> 16) << std::setw(4) << (c >> 16);
+
+	return ss.str();
+}
+
+
+
+
+
+

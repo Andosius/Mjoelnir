@@ -16,3 +16,5 @@ glm::vec3 CalculateHeadPosition(glm::vec3 src, glm::vec3 dest);
 bool TraceLine(uintptr_t baseAddr, ent* localPlayer, glm::vec3 target);
 
 bool OpenGL_WorldToScreen(glm::vec3 pos, glm::mat4x4* viewMatrix, glm::vec2& screen, glm::vec2 windowData);
+
+std::string generate_uuid();

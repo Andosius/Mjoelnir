@@ -14,6 +14,7 @@
 #include <imgui_internal.h>
 
 #include "WindowViewport.hpp"
+#include "IDrawing.hpp"
 
 #ifndef DEBUG_PRINT
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
@@ -55,5 +56,8 @@ namespace Overlay {
 
 	// Helper functions
 	HWND GetWindowHandle(DWORD processID, const wchar_t* overlayedWindowClassName);
+
+	std::string RegisterPlugin(IDrawing* plugin);
+	bool RemovePlugin(std::string UUID);
 
 }

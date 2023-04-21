@@ -2,28 +2,38 @@
 
 #include "Overlay.hpp"
 
+#include "IDrawing.hpp"
+#include "Utils.hpp"
+
+#include <iostream>
+#include <map>
+#include <mutex>
 
 // DirectX 9 Data
-static LPDIRECT3D9                  g_Instance = nullptr;
-static LPDIRECT3DDEVICE9            g_Device = nullptr;
-static D3DPRESENT_PARAMETERS        g_PresentParams = {};
+static LPDIRECT3D9                      g_Instance = nullptr;
+static LPDIRECT3DDEVICE9                g_Device = nullptr;
+static D3DPRESENT_PARAMETERS            g_PresentParams = {};
 
 // Overlay Data
-static HMODULE                      s_Instance = NULL;
-static LPSTR                        s_WindowName = nullptr;
-static LPSTR                        s_WindowClassName = nullptr;
+static HMODULE                          s_Instance = NULL;
+static LPSTR                            s_WindowName = nullptr;
+static LPSTR                            s_WindowClassName = nullptr;
 
-static DWORD                        s_OverlayedProcessID = NULL;
-static HWND                         s_OverlayedHandle = NULL;
-static WNDPROC                      s_OverlayedOriginalProcedure = nullptr;
+static DWORD                            s_OverlayedProcessID = NULL;
+static HWND                             s_OverlayedHandle = NULL;
+static WNDPROC                          s_OverlayedOriginalProcedure = nullptr;
 
-static HWND                         s_WindowHandle = NULL;
-static WNDCLASSA                    s_WindowClass = {};
+static HWND                             s_WindowHandle = NULL;
+static WNDCLASSA                        s_WindowClass = {};
 
-static bool                         s_WindowRegistered = false;
+static bool                             s_WindowRegistered = false;
 
-static bool                         s_Visible = false;
-static bool                         s_ResetRequested = false;
+static bool                             s_Visible = false;
+static bool                             s_ResetRequested = false;
+
+static std::map<std::string, IDrawing*> s_Plugins = {};
+static std::vector<Vertices>            s_Vertices(500);
+static std::mutex                       s_Mutex = {};
 
 namespace Overlay {
 
@@ -287,6 +297,12 @@ namespace Overlay {
     static LRESULT CALLBACK WindowProcedureTimer(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime)
     {
         RenderDirectX9Frame();
+
+        if (s_Vertices.size() > 0)
+        {
+            // check _D3DPRIMITIVETYPE out!
+        }
+
         return TRUE;
     }
 
@@ -350,6 +366,39 @@ namespace Overlay {
             return true;
         }
         return CallWindowProcA(reinterpret_cast<WNDPROC>(s_OverlayedOriginalProcedure), handle, message, wParam, lParam);
+    }
+
+	std::string RegisterPlugin(IDrawing* plugin)
+	{
+		std::string UUID = generate_uuid();
+		s_Plugins.insert(make_pair(UUID, plugin));
+
+		return UUID;
+	}
+
+	bool RemovePlugin(std::string UUID)
+	{
+		auto it = s_Plugins.find(UUID);
+
+		if (it != s_Plugins.end())
+		{
+			s_Plugins.erase(UUID);
+			return true;
+		}
+		return false;
+	}
+
+    std::mutex* GetMutex()
+    {
+        return &s_Mutex;
+    }
+
+    void SendVertices(std::vector<Vertices> vertices)
+    {
+        // Just to make sure we don't bug the code by sending multiple vertices at the same time. :)
+        s_Mutex.lock();
+        // TODO: move vertices to list!
+        s_Mutex.unlock();
     }
 
 }
