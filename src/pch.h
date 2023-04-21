@@ -27,9 +27,5 @@
 //#include "CAmmo.hpp"
 //#include "CHealth.hpp"
 
-#ifndef DEBUG_PRINT
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#endif // !DEBUG_PRINT
-
 
 #endif //PCH_H
