@@ -28,7 +28,7 @@ glm::vec3 CalculateHeadPosition(glm::vec3 src, glm::vec3 dest)
 	return angles; 
 }
 
-bool TraceLine(uintptr_t baseAddr, ent* localPlayer, glm::vec3 target)
+bool TraceLine(uintptr_t baseAddr, ent* localPlayer, glm::vec3 target, int playerCheck, int skipObjects)
 {
 	uintptr_t tr_func = baseAddr + TRACE_LINE_FUNC;
 	glm::vec3 start = localPlayer->m_HeadPosition;
@@ -37,8 +37,8 @@ bool TraceLine(uintptr_t baseAddr, ent* localPlayer, glm::vec3 target)
 
 	__asm
 	{
-		push 0; bSkipTags
-		push 0; bCheckPlayers
+		push skipObjects; bSkipTags
+		push playerCheck; bCheckPlayers
 		push localPlayer
 		push target.z
 		push target.y

@@ -13,7 +13,7 @@ struct traceresult_s
 
 float GetDistance(const glm::vec3 src, const glm::vec3 dest);
 glm::vec3 CalculateHeadPosition(glm::vec3 src, glm::vec3 dest);
-bool TraceLine(uintptr_t baseAddr, ent* localPlayer, glm::vec3 target);
+bool TraceLine(uintptr_t baseAddr, ent* localPlayer, glm::vec3 target, int playerCheck = false, int skipObjects = false);
 
 bool OpenGL_WorldToScreen(glm::vec3 pos, glm::mat4x4* viewMatrix, glm::vec2& screen, glm::vec2 windowData);
 
