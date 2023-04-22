@@ -384,9 +384,9 @@ namespace Overlay {
         }
 
         // In case the menu is open, we don't wanna send anything to the game
+        ImGui_ImplWin32_WndProcHandler(handle, message, wParam, lParam);
         if (s_Visible)
         {
-            ImGui_ImplWin32_WndProcHandler(handle, message, wParam, lParam);
             return true;
         }
         return CallWindowProcA(reinterpret_cast<WNDPROC>(s_OverlayedOriginalProcedure), handle, message, wParam, lParam);
