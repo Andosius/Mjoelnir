@@ -41,7 +41,7 @@ DWORD WINAPI MainThread(HMODULE hModule)
 	client.AddCheat(new CAmmo(&client, VK_NUMPAD6, "AmmoHack"));
 	client.AddCheat(new CHealth(&client, VK_NUMPAD7, "Invulnerability"));
 
-    // Create overlay
+	// Create overlay
 	Overlay::InitializeParameter(hModule, OVERLAY_CLASS_NAME, WINDOW_NAME, WINDOW_CLASS_NAME);
 	Overlay::Setup();
 
