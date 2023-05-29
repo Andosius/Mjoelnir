@@ -1,66 +1,50 @@
+/*
+    Original design by TheCherno, Walnut
+    https://github.com/TheCherno/Walnut
+*/
+
 #pragma once
 
-#include <d3d9.h>
-#include <d3dx9.h>
-#pragma comment(lib, "d3d9.lib")
-#pragma comment(lib, "d3dx9.lib")
-
-#include <Windows.h>
-#include <atlbase.h>
-
-#include <imgui.h>
-#include <imgui_impl_dx9.h>
-#include <imgui_impl_win32.h>
-#include <imgui_internal.h>
-
-#include "WindowViewport.hpp"
-#include "IDrawing.hpp"
-
-#ifndef DEBUG_PRINT
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#endif // !DEBUG_PRINT
-
-#define TARGET_KEY VK_INSERT
+#include <string>
 
 
-struct ImGui_ImplDX9_Data;
-struct ImGui_ImplWin32_Data;
+struct GLFWwindow;
 
-extern ImGui_ImplDX9_Data* ImGui_ImplDX9_GetBackendData();
-extern ImGui_ImplWin32_Data* ImGui_ImplWin32_GetBackendData();
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM, LPARAM);
-
-namespace Overlay {
-
-	// Main functions - don't use anything else! Easy to break!!!!!
-	bool Setup();
-	void Shutdown();
-	void Routine();
+struct OverlaySpecification {
+    std::string Name = "Vulkan Overlay";
+    uint32_t Width = 1200;
+    uint32_t Height = 800;
+};
 
 
-	// DirectX 9 Functions
-	bool CreateDirectX9Device(HWND handle, WindowViewport& view);
-	void DestroyDirectX9Device();
-	void ResetDirectX9Device();
-	void RenderDirectX9Frame();
+class Overlay {
+public:
+    Overlay(const OverlaySpecification& overlaySpecification = OverlaySpecification());
+    ~Overlay();
 
-	// Overlay Functions
-	void RenderOverlay();
+    void Run();
+    void Close();
 
-	void InitializeParameter(HMODULE hInstance, const wchar_t* overlayedWindowClassName, LPSTR windowName, LPSTR windowClassName);
-	ATOM CreateWindowClass();
+    virtual void OnUpdate(float ts);
 
-	static LRESULT WINAPI WindowProcedure(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
-	static LRESULT CALLBACK WindowProcedureTimer(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
-	static LRESULT CALLBACK OverlayedWindowProcedureHook(const HWND handle, const UINT message, const WPARAM wParam, const LPARAM lParam);
+    static Overlay& Get();
+    float GetTime();
 
-	// Helper functions
-	HWND GetWindowHandle(DWORD processID, const wchar_t* overlayedWindowClassName);
+    GLFWwindow* GetWindowHandle() const { return m_WindowHandle; }
 
-	std::string RegisterPlugin(IDrawing* plugin);
-	bool RemovePlugin(std::string UUID);
 
-	std::mutex* GetMutex();
-	void SendVertices(std::vector<Object> vertices);
+private:
+    void Init();
+    void Shutdown();
 
-}
+
+private:
+    OverlaySpecification m_Specification;
+    GLFWwindow* m_WindowHandle = nullptr;
+
+    bool m_Running = false;
+
+    float m_TimeStep = 0.0f;
+    float m_FrameTime = 0.0f;
+    float m_LastFrameTime = 0.0f;
+};
