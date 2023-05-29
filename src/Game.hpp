@@ -34,6 +34,8 @@ public:
 	std::mutex* GetMutex() { return &p_Mutex; };
 
 	void AddCheat(ICheat* cheat) { m_Cheats.push_back(cheat); };
+	std::vector<ICheat*>* GetCheats() { return &m_Cheats; }
+	
 
 	glm::vec2 GetWindowData() { return m_WindowData; };
 
