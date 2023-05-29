@@ -1,3 +1,4 @@
+#include "pch.h"
 #define IMGUI_UNLIMITED_FRAME_RATE
 
 #include "Overlay.hpp"
@@ -540,6 +541,65 @@ void Overlay::Init()
     g_SwapChainRebuild = true;
 }
 
+void Overlay::Routine()
+{
+	ImGui_ImplVulkanH_Window* wd = &g_MainWindowData;
+	ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	ImGuiIO& io = ImGui::GetIO();
+
+	// Poll and handle events (inputs, window resize, etc.)
+    // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+    // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
+    // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
+    // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+	glfwPollEvents();
+
+	// Resize swap chain?
+	if (g_SwapChainRebuild)
+	{
+		int width, height;
+		glfwGetFramebufferSize(m_WindowHandle, &width, &height);
+		if (width > 0 && height > 0)
+		{
+			ImGui_ImplVulkan_SetMinImageCount(g_MinImageCount);
+			ImGui_ImplVulkanH_CreateOrResizeWindow(g_Instance, g_PhysicalDevice, g_Device, &g_MainWindowData, g_QueueFamily, g_Allocator, width, height, g_MinImageCount);
+			g_MainWindowData.FrameIndex = 0;
+			g_SwapChainRebuild = false;
+		}
+	}
+
+	// Start the Dear ImGui frame
+	ImGui_ImplVulkan_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	// Overlay stuff
+	this->OnUpdate(m_TimeStep);
+	// Overlay stuff end
+
+
+	// Rendering
+	ImGui::Render();
+	ImDrawData* draw_data = ImGui::GetDrawData();
+	const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
+	if (!is_minimized)
+	{
+		wd->ClearValue.color.float32[0] = clear_color.x * clear_color.w;
+		wd->ClearValue.color.float32[1] = clear_color.y * clear_color.w;
+		wd->ClearValue.color.float32[2] = clear_color.z * clear_color.w;
+		wd->ClearValue.color.float32[3] = clear_color.w;
+		FrameRender(wd, draw_data);
+		FramePresent(wd);
+	}
+
+	float time = GetTime();
+	m_FrameTime = time - m_LastFrameTime;
+	m_TimeStep = glm::min<float>(m_FrameTime, 0.0333f);
+	m_LastFrameTime = time;
+
+}
+
 
 void Overlay::Run()
 {
@@ -553,55 +613,7 @@ void Overlay::Run()
 
     while(!glfwWindowShouldClose(m_WindowHandle) && m_Running)
     {
-        // Poll and handle events (inputs, window resize, etc.)
-        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-        glfwPollEvents();
-
-        // Resize swap chain?
-        if (g_SwapChainRebuild)
-        {
-            int width, height;
-            glfwGetFramebufferSize(m_WindowHandle, &width, &height);
-            if (width > 0 && height > 0)
-            {
-                ImGui_ImplVulkan_SetMinImageCount(g_MinImageCount);
-                ImGui_ImplVulkanH_CreateOrResizeWindow(g_Instance, g_PhysicalDevice, g_Device, &g_MainWindowData, g_QueueFamily, g_Allocator, width, height, g_MinImageCount);
-                g_MainWindowData.FrameIndex = 0;
-                g_SwapChainRebuild = false;
-            }
-        }
-
-        // Start the Dear ImGui frame
-        ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // Overlay stuff
-        this->OnUpdate(m_TimeStep);
-        // Overlay stuff end
-
-
-        // Rendering
-        ImGui::Render();
-        ImDrawData* draw_data = ImGui::GetDrawData();
-        const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
-        if (!is_minimized)
-        {
-            wd->ClearValue.color.float32[0] = clear_color.x * clear_color.w;
-            wd->ClearValue.color.float32[1] = clear_color.y * clear_color.w;
-            wd->ClearValue.color.float32[2] = clear_color.z * clear_color.w;
-            wd->ClearValue.color.float32[3] = clear_color.w;
-            FrameRender(wd, draw_data);
-            FramePresent(wd);
-        }
-
-        	float time = GetTime();
-			m_FrameTime = time - m_LastFrameTime;
-			m_TimeStep = glm::min<float>(m_FrameTime, 0.0333f);
-			m_LastFrameTime = time;
+        Routine();
     }
 }
 

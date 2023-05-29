@@ -22,6 +22,8 @@ public:
     Overlay(const OverlaySpecification& overlaySpecification = OverlaySpecification());
     ~Overlay();
 
+    void Routine();
+
     void Run();
     void Close();
 
