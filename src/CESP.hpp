@@ -13,5 +13,4 @@ class CESP : public IThreadedCheat, public IDrawing
 	using IThreadedCheat::Toggle;
 	using IThreadedCheat::CheckInteraction;
 
-	using IDrawing::ResetVertices;
 };

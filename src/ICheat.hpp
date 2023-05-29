@@ -36,6 +36,10 @@ public:
 	virtual void Disable() {};
 
 
+	bool* GetStateElement() {
+		return &m_Active;
+	}
+
 protected:
 	Game* m_Client = nullptr;
 	bool m_Active;

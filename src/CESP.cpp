@@ -3,14 +3,12 @@
 #include "CESP.hpp"
 
 #include "Utils.hpp"
-#include "Overlay.hpp"
+
 
 void CESP::Routine()
 {
 	while (m_Active)
 	{
-
-		ResetVertices();
 
 		// In case we are not alive we won't do anything
 		if (!m_Client->GetLocalPlayer()->IsAlive())
@@ -28,10 +26,6 @@ void CESP::Routine()
 				// TODO: Draw stuff! :)
 			}
 		}
-
-		Overlay::GetMutex()->lock();
-		Overlay::SendVertices(m_Objects);
-		Overlay::GetMutex()->unlock();
+		m_Client->GetMutex()->unlock();
 	}
-	m_Client->GetViewMatrix();
 }
