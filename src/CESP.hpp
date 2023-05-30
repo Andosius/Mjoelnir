@@ -1,16 +1,17 @@
 #pragma once
 
-#include "IThreadedCheat.hpp"
+#include "ICheat.hpp"
 #include "IDrawing.hpp"
 
-class CESP : public IThreadedCheat, public IDrawing
+class CESP : public ICheat, public IDrawing
 {
-	using IThreadedCheat::IThreadedCheat;
+	using ICheat::ICheat;
 	virtual void Routine() override;
 
-	using IThreadedCheat::Enable;
-	using IThreadedCheat::Disable;
-	using IThreadedCheat::Toggle;
-	using IThreadedCheat::CheckInteraction;
+	using ICheat::Enable;
+	using ICheat::Disable;
+	using ICheat::Toggle;
+	using ICheat::CheckInteraction;
+	using ICheat::IsActive;
 
 };
