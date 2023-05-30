@@ -1,5 +1,7 @@
 #include <Windows.h>
 
+#include <stdint.h>
+
 struct WindowViewport {
 
 	uint32_t X, Y, Width, Height;
