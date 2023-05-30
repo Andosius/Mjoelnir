@@ -24,7 +24,7 @@ void Game::Initialize()
 		ent* playerent = *(ent**)(m_BaseAddr + LOCAL_PLAYER_ADDRESS);
 		m_LocalPlayer = new Entity(playerent);
 
-		m_Matrix = *(glm::mat4x4**)(m_BaseAddr + OPENGL_MATRIX_ADDRESS);
+		m_Matrix = (glm::mat4x4*)(m_BaseAddr + OPENGL_MATRIX_ADDRESS);
 	}
 
 	m_Window = FindWindow(nullptr, L"AssaultCube");
