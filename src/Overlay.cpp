@@ -425,6 +425,7 @@ void Overlay::Init()
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+    glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
     // style window end
 
 
@@ -459,8 +460,13 @@ void Overlay::Init()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse; // Disable Mouse
+    io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard; // Disable Keyboard
+    glfwSetWindowAttrib(m_WindowHandle, GLFW_MOUSE_PASSTHROUGH, GLFW_TRUE);
+
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
