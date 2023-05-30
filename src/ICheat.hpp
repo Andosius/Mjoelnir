@@ -35,6 +35,7 @@ public:
 	virtual void Enable() {};
 	virtual void Disable() {};
 
+	bool IsActive() { return m_Active; }
 
 	bool* GetStateElement() {
 		return &m_Active;
