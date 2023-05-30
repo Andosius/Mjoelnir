@@ -69,8 +69,10 @@ bool OpenGL_WorldToScreen(glm::vec3 pos, glm::mat4x4* viewMatrix, glm::vec2& scr
 	glm::vec3 normalized = { clip.x / clip.w, clip.y / clip.w, clip.z / clip.w }; 
 
 	// Transformation to window coordiantes
-	screen.x = (windowData.x / 2 * normalized.x) + (normalized.x + windowData.x / 2.0f);
-	screen.y = -(windowData.y / 2 * normalized.y) + (normalized.y + windowData.y / 2.0f);
+	//screen.x = (windowData.x / 2 * normalized.x) + (normalized.x + windowData.x / 2.0f);
+	//screen.y = -(windowData.y / 2 * normalized.y) + (normalized.y + windowData.y / 2.0f);
+	screen.x = (1920.0f / 2 * normalized.x) + (normalized.x + 1920.0f / 2.0f);
+	screen.y = -(1080.0f / 2 * normalized.y) + (normalized.y + 1080.0f / 2.0f);
 	return true;
 }
 
