@@ -4,6 +4,7 @@
 
 #include "Utils.hpp"
 #include "Application.hpp"
+#include "WindowViewport.hpp"
 
 #include "imgui.h"
 
@@ -11,7 +12,7 @@
 
 constexpr float BODY_HEIGHT = 4.5f;
 constexpr float SUB_HALF = 2.25f;
-constexpr float RADIUS = 5.0f;
+constexpr float RADIUS = 15.0f;
 
 
 void CESP::Routine()
@@ -23,6 +24,12 @@ void CESP::Routine()
 	if (!m_Client->GetLocalPlayer()->IsAlive())
 		return;
 
+	DWORD processID = GetCurrentProcessId();
+	HWND handle = GetWindowHandle(processID, L"SDL_app");
+	WindowViewport viewport = WindowViewport::GetWindowViewport(handle);
+
+	glm::vec2 windowData = glm::vec2(viewport.Width, viewport.Height);
+
 	for (auto& target : *m_Client->GetPlayers())
 	{
 		glm::vec2 screen_pos{};
@@ -31,8 +38,7 @@ void CESP::Routine()
 		// Get screen location
 		glm::vec2 window = m_Client->GetWindowData();
 
-		//bool on_screen = WorldToScreen(target_middle, screen_pos, matrix, (int)window.x, (int)window.y);
-		bool on_screen = OpenGL_WorldToScreen(target_middle, m_Client->GetViewMatrix(), screen_pos, m_Client->GetWindowData());
+		bool on_screen = OpenGL_WorldToScreen(target_middle, m_Client->GetViewMatrix(), screen_pos, windowData);
 
 		if (on_screen && m_Active)
 		{
@@ -50,7 +56,7 @@ void CESP::Routine()
 				color.Value.y = 255;
 
 			// Add circle
-			DrawData data = { ImVec2(screen_pos.x, screen_pos.y), ImVec2(), color, RADIUS, DrawType::Circle };
+			DrawData data = { ImVec2(screen_pos.x + viewport.X, screen_pos.y + viewport.Y), ImVec2(), color, RADIUS, DrawType::Circle };
 
 			m_DrawData.push_back(data);
 		}

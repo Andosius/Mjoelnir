@@ -17,4 +17,6 @@ bool TraceLine(uintptr_t baseAddr, ent* localPlayer, glm::vec3 target, int playe
 
 bool OpenGL_WorldToScreen(glm::vec3 pos, glm::mat4x4* viewMatrix, glm::vec2& screen, glm::vec2 windowData);
 
+HWND GetWindowHandle(DWORD processID, const wchar_t* overlayedWindowClassName);
+
 std::string generate_uuid();
